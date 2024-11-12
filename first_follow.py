@@ -25,7 +25,9 @@ class Grammar:
         for lhs, rhs in self.productions:
             self.non_terminals.add(lhs)
             for symbol in rhs:
-                if not symbol.isupper() and symbol != 'ε':
+                if symbol == 'ε':
+                    continue
+                if not symbol.isupper() and symbol not in self.terminals:
                     self.terminals.add(symbol)
                 elif symbol.isupper():
                     self.non_terminals.add(symbol)
@@ -92,7 +94,9 @@ class Grammar:
         """
         print("Conjuntos FIRST:")
         for non_terminal in sorted(self.non_terminals):
-            print(f"FIRST({non_terminal}) = {{ {', '.join(sorted(self.first[non_terminal]))} }}")
+            if self.first[non_terminal]:
+                first_set = ', '.join(sorted(self.first[non_terminal]))
+                print(f"FIRST({non_terminal}) = {{ {first_set} }}")
 
     def display_follow(self):
         """
@@ -100,16 +104,17 @@ class Grammar:
         """
         print("\nConjuntos FOLLOW:")
         for non_terminal in sorted(self.non_terminals):
-            print(f"FOLLOW({non_terminal}) = {{ {', '.join(sorted(self.follow[non_terminal]))} }}")
+            if self.follow[non_terminal]:
+                follow_set = ', '.join(sorted(self.follow[non_terminal]))
+                print(f"FOLLOW({non_terminal}) = {{ {follow_set} }}")
 
 def main():
-    # Ejemplo de gramática
-    # Gramática para expresiones aritméticas simples
-    # E → T E'
+    # Gramática
+    # E  → T E'
     # E' → + T E' | ε
-    # T → F T'
+    # T  → F T'
     # T' → * F T' | ε
-    # F → ( E ) | id
+    # F  → ( E ) | id | num
 
     productions = [
         ('E', ['T', "E'"]),
@@ -119,7 +124,8 @@ def main():
         ("T'", ['*', 'F', "T'"]),
         ("T'", ['ε']),
         ('F', ['(', 'E', ')']),
-        ('F', ['id'])
+        ('F', ['id']),
+        ('F', ['num'])  
     ]
 
     start_symbol = 'E'
